@@ -12,6 +12,8 @@ class CurrencyExchangeGroup extends StatelessWidget {
     @required this.toCurrency,
     this.onSwapCurrency,
     this.onSelectCurrency,
+    @required this.quote,
+    this.amountEditingController,
   }) : super(key: key);
 
   static const String FROM_CURRENCY_KEY = 'FROM_CURRENCY';
@@ -21,6 +23,8 @@ class CurrencyExchangeGroup extends StatelessWidget {
   final Currency toCurrency;
   final VoidCallback onSwapCurrency;
   final void Function(String) onSelectCurrency;
+  final Future<Map<String, num>> quote;
+  final TextEditingController amountEditingController;
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +48,7 @@ class CurrencyExchangeGroup extends StatelessWidget {
               ),
             ),
             CurrencyExchangeTile(
+              controller: amountEditingController,
               currency: fromCurrency,
               onFlagPressed: () {
                 onSelectCurrency(FROM_CURRENCY_KEY);
@@ -76,6 +81,8 @@ class CurrencyExchangeGroup extends StatelessWidget {
             CurrencyTile(
               baseCurrency: toCurrency,
               fromCurrency: fromCurrency,
+              quote: quote,
+              amountController: amountEditingController,
               onFlagPressed: () {
                 onSelectCurrency(TO_CURRENCY_KEY);
               },

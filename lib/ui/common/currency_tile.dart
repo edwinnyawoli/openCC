@@ -2,6 +2,7 @@ import 'package:country_currency_pickers/country.dart';
 import 'package:country_currency_pickers/country_pickers.dart';
 import 'package:currency_picker/currency_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 
 ///
 /// CurrencyExchangeTile is a widget that allows you to select a currency
@@ -66,21 +67,46 @@ class CurrencyExchangeTile extends StatelessWidget {
 /// A CurrencyTile widget displays exchange rate information
 /// between a base currency and another currency.
 ///
-class CurrencyTile extends StatelessWidget {
-  const CurrencyTile(
-      {Key key, this.baseCurrency, this.onFlagPressed, this.fromCurrency})
-      : super(key: key);
+class CurrencyTile extends StatefulWidget {
+  const CurrencyTile({
+    Key key,
+    @required this.baseCurrency,
+    this.onFlagPressed,
+    @required this.fromCurrency,
+    @required this.quote,
+    @required this.amountController,
+  }) : super(key: key);
   // The currency being converted to
   final Currency baseCurrency;
   // The currency being converted from
   final Currency fromCurrency;
   final VoidCallback onFlagPressed;
+  final Future<Map<String, num>> quote;
+  // The controller from which the amount value will be retrieved
+  final TextEditingController amountController;
+
+  @override
+  _CurrencyTileState createState() => _CurrencyTileState();
+}
+
+class _CurrencyTileState extends State<CurrencyTile> {
+  num amount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.amountController.addListener(() {
+      setState(() {
+        amount = num.tryParse(widget.amountController.text) ?? 0;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final Country country =
-        CountryPickerUtils.getCountryByCurrencyCode(baseCurrency.code);
+        CountryPickerUtils.getCountryByCurrencyCode(widget.baseCurrency.code);
 
     return Container(
       height: 64,
@@ -92,7 +118,7 @@ class CurrencyTile extends StatelessWidget {
         children: <Widget>[
           CountrySelector(
             country: country,
-            onFlagPressed: onFlagPressed,
+            onFlagPressed: widget.onFlagPressed,
           ),
           const VerticalDivider(
             indent: 8,
@@ -103,45 +129,121 @@ class CurrencyTile extends StatelessWidget {
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Text(
-                      baseCurrency.code,
-                      style: theme.textTheme.subtitle1.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.lightBlue,
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        '${baseCurrency.symbol} 7890.50',
-                        textAlign: TextAlign.end,
-                        style: theme.textTheme.subtitle1.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ),
-                  ],
+                Text(
+                  widget.baseCurrency.code,
+                  style: theme.textTheme.subtitle1.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.lightBlue,
+                  ),
                 ),
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        baseCurrency.name,
-                        style: theme.textTheme.caption,
-                      ),
-                    ),
-                    Text(
-                      '1 ${fromCurrency.code} = 73.04 ${baseCurrency.code}',
-                      style: theme.textTheme.caption,
-                    ),
-                  ],
-                ),
+                Text(
+                  widget.baseCurrency.name,
+                  style: theme.textTheme.caption,
+                )
               ],
             ),
           ),
+          Expanded(
+            child: FutureBuilder<Map<String, num>>(
+              future: widget.quote,
+              builder: (BuildContext context,
+                  AsyncSnapshot<Map<String, num>> snapshot) {
+                Widget amountWidget;
+                Widget rateWidget;
+
+                switch (snapshot.connectionState) {
+                  case ConnectionState.waiting:
+                    amountWidget = SizedBox(
+                      width: 200.0,
+                      height: 100.0,
+                      child: Shimmer.fromColors(
+                        baseColor: Colors.red,
+                        highlightColor: Colors.yellow,
+                        child: const SizedBox(width: 50, height: 8),
+                      ),
+                    );
+                    rateWidget = Container();
+                    break;
+
+                  default:
+                    String amountStr = '?';
+                    String rate = '?';
+                    if (!snapshot.hasError) {
+                      final num rateValue = snapshot.data.entries.first.value;
+                      rate = rateValue?.toStringAsFixed(4);
+                      amountStr = (amount * rateValue).toStringAsFixed(2);
+                    }
+
+                    amountWidget = Text(
+                      '${widget.baseCurrency.symbol} $amountStr',
+                      textAlign: TextAlign.end,
+                      style: theme.textTheme.subtitle1.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    );
+                    rateWidget = Text(
+                      '1 ${widget.fromCurrency.code} = $rate ${widget.baseCurrency.code}',
+                      style: theme.textTheme.caption,
+                    );
+                    break;
+                }
+
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    amountWidget,
+                    rateWidget,
+                  ],
+                );
+              },
+            ),
+          ),
+          // Expanded(
+          //   child: Column(
+          //     mainAxisAlignment: MainAxisAlignment.center,
+          //     children: <Widget>[
+          //       Row(
+          //         children: <Widget>[
+          //           Text(
+          //             baseCurrency.code,
+          //             style: theme.textTheme.subtitle1.copyWith(
+          //               fontWeight: FontWeight.bold,
+          //               color: Colors.lightBlue,
+          //             ),
+          //           ),
+          //           Expanded(
+          //             child: Text(
+          //               '${baseCurrency.symbol} 7890.50',
+          //               textAlign: TextAlign.end,
+          //               style: theme.textTheme.subtitle1.copyWith(
+          //                 fontWeight: FontWeight.bold,
+          //                 color: Colors.black87,
+          //               ),
+          //             ),
+          //           ),
+          //         ],
+          //       ),
+          //       Row(
+          //         children: <Widget>[
+          //           Expanded(
+          //             child: Text(
+          //               baseCurrency.name,
+          //               style: theme.textTheme.caption,
+          //             ),
+          //           ),
+          //           Text(
+          //             '1 ${fromCurrency.code} = 73.04 ${baseCurrency.code}',
+          //             style: theme.textTheme.caption,
+          //           ),
+          //         ],
+          //       ),
+          //     ],
+          //   ),
+          // ),
           const SizedBox(width: 12),
         ],
       ),
