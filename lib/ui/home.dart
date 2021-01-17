@@ -36,7 +36,7 @@ class _HomePageState extends State<HomePage> {
   void selectCurrency(String target) {
     showCurrencyPicker(
       context: context,
-      showFlag: true,
+      showFlag: false,
       showCurrencyName: true,
       showCurrencyCode: true,
       onSelect: (Currency currency) {
