@@ -126,7 +126,8 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   CurrencyTile(
-                    currency: toCurrency,
+                    baseCurrency: toCurrency,
+                    fromCurrency: fromCurrency,
                     onFlagPressed: () {
                       selectCurrency(TO_CURRENCY_KEY);
                     },

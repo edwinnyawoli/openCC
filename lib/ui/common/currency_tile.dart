@@ -67,16 +67,20 @@ class CurrencyExchangeTile extends StatelessWidget {
 /// between a base currency and another currency.
 ///
 class CurrencyTile extends StatelessWidget {
-  const CurrencyTile({Key key, this.currency, this.onFlagPressed})
+  const CurrencyTile(
+      {Key key, this.baseCurrency, this.onFlagPressed, this.fromCurrency})
       : super(key: key);
-  final Currency currency;
+  // The currency being converted to
+  final Currency baseCurrency;
+  // The currency being converted from
+  final Currency fromCurrency;
   final VoidCallback onFlagPressed;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final Country country =
-        CountryPickerUtils.getCountryByCurrencyCode(currency.code);
+        CountryPickerUtils.getCountryByCurrencyCode(baseCurrency.code);
 
     return Container(
       height: 64,
@@ -103,7 +107,7 @@ class CurrencyTile extends StatelessWidget {
                 Row(
                   children: <Widget>[
                     Text(
-                      currency.code,
+                      baseCurrency.code,
                       style: theme.textTheme.subtitle1.copyWith(
                         fontWeight: FontWeight.bold,
                         color: Colors.lightBlue,
@@ -111,7 +115,7 @@ class CurrencyTile extends StatelessWidget {
                     ),
                     Expanded(
                       child: Text(
-                        '${currency.symbol} 7890.50',
+                        '${baseCurrency.symbol} 7890.50',
                         textAlign: TextAlign.end,
                         style: theme.textTheme.subtitle1.copyWith(
                           fontWeight: FontWeight.bold,
@@ -125,12 +129,12 @@ class CurrencyTile extends StatelessWidget {
                   children: <Widget>[
                     Expanded(
                       child: Text(
-                        currency.name,
+                        baseCurrency.name,
                         style: theme.textTheme.caption,
                       ),
                     ),
                     Text(
-                      '1 USD = 73.04 ${currency.code}',
+                      '1 ${fromCurrency.code} = 73.04 ${baseCurrency.code}',
                       style: theme.textTheme.caption,
                     ),
                   ],
