@@ -1,8 +1,6 @@
 import 'package:currency_picker/currency_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_vector_icons/flutter_vector_icons.dart';
-import 'package:opencc/ui/common/currency_tile.dart';
-import 'package:opencc/ui/common/label.dart';
+import 'package:opencc/ui/common/currency_exchange_group.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,8 +11,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Locale> systemLocales;
-  static const String FROM_CURRENCY_KEY = 'FROM_CURRENCY';
-  static const String TO_CURRENCY_KEY = 'TO_CURRENCY';
   Currency fromCurrency;
   Currency toCurrency;
   bool showLabels = false;
@@ -42,11 +38,11 @@ class _HomePageState extends State<HomePage> {
       onSelect: (Currency currency) {
         setState(() {
           switch (target) {
-            case FROM_CURRENCY_KEY:
+            case CurrencyExchangeGroup.FROM_CURRENCY_KEY:
               fromCurrency = currency;
               break;
 
-            case TO_CURRENCY_KEY:
+            case CurrencyExchangeGroup.TO_CURRENCY_KEY:
               toCurrency = currency;
               break;
           }
@@ -78,64 +74,13 @@ class _HomePageState extends State<HomePage> {
             ),
             height: showLabels ? 280 : 240,
           ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Visibility(
-                    visible: showLabels,
-                    child: Label(
-                      padding: const EdgeInsets.only(bottom: 2),
-                      child: Text(
-                        'Convert from',
-                        style: theme.textTheme.subtitle1
-                            .copyWith(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                  CurrencyExchangeTile(
-                    currency: fromCurrency,
-                    onFlagPressed: () {
-                      selectCurrency(FROM_CURRENCY_KEY);
-                    },
-                  ),
-                  Align(
-                    alignment: Alignment.center,
-                    child: IconButton(
-                      icon: const Icon(
-                        MaterialIcons.swap_vertical_circle,
-                        color: Colors.white,
-                        size: 30,
-                      ),
-                      onPressed: () {
-                        swapCurrencies();
-                      },
-                    ),
-                  ),
-                  Visibility(
-                    visible: showLabels,
-                    child: Label(
-                      padding: const EdgeInsets.only(bottom: 2),
-                      child: Text(
-                        'To',
-                        style: theme.textTheme.subtitle1
-                            .copyWith(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                  CurrencyTile(
-                    baseCurrency: toCurrency,
-                    fromCurrency: fromCurrency,
-                    onFlagPressed: () {
-                      selectCurrency(TO_CURRENCY_KEY);
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
+          CurrencyExchangeGroup(
+            fromCurrency: fromCurrency,
+            toCurrency: toCurrency,
+            showLabels: false,
+            onSwapCurrency: swapCurrencies,
+            onSelectCurrency: selectCurrency,
+          )
         ],
       ),
     );
