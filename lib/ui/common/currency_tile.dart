@@ -281,10 +281,12 @@ class CurrencyTextField extends StatelessWidget {
           prefixIcon: Container(
             margin: const EdgeInsets.all(2.0),
             color: Colors.grey.shade100,
-            padding: const EdgeInsets.only(left: 16.0, top: 12.0),
-            child: Text(
-              currency.symbol,
-              style: theme.textTheme.headline6,
+            padding: const EdgeInsets.all(12.0),
+            child: FittedBox(
+              child: Text(
+                currency.symbol,
+                style: theme.textTheme.headline6,
+              ),
             ),
           ),
           isDense: true,
