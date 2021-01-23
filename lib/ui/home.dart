@@ -147,7 +147,7 @@ class _HomePageState extends State<HomePage> {
                 Expanded(
                   child: ListView.separated(
                     padding: const EdgeInsets.only(
-                        left: 16, right: 16, bottom: 32, top: 2),
+                        left: 16, right: 16, bottom: 32, top: 4),
                     itemCount: filteredCurrencies.length,
                     itemBuilder: (BuildContext context, int index) {
                       final Currency baseCurrency =
