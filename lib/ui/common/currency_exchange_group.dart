@@ -57,7 +57,7 @@ class CurrencyExchangeGroup extends StatelessWidget {
                 ),
               ),
             ),
-            CurrencyExchangeTile(
+            CurrencyValueInputTile(
               controller: amountEditingController,
               currency: fromCurrency,
               onFlagPressed: () {
@@ -88,7 +88,7 @@ class CurrencyExchangeGroup extends StatelessWidget {
                 ),
               ),
             ),
-            CurrencyTile(
+            CurrencyExchangeTile(
               baseCurrency: toCurrency,
               fromCurrency: fromCurrency,
               quote: quote,

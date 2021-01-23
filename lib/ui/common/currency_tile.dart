@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
 ///
-/// CurrencyExchangeTile is a widget that allows you to select a currency
+/// CurrencyValueInputTile is a widget that allows you to select a currency
 /// and input an amount to be converted into another currency.
 ///
-class CurrencyExchangeTile extends StatelessWidget {
-  const CurrencyExchangeTile({
+class CurrencyValueInputTile extends StatelessWidget {
+  const CurrencyValueInputTile({
     Key key,
     this.currency,
     this.margin,
@@ -64,11 +64,11 @@ class CurrencyExchangeTile extends StatelessWidget {
 }
 
 ///
-/// A CurrencyTile widget displays exchange rate information
+/// A CurrencyExchangeTile widget displays exchange rate information
 /// between a base currency and another currency.
 ///
-class CurrencyTile extends StatefulWidget {
-  const CurrencyTile({
+class CurrencyExchangeTile extends StatefulWidget {
+  const CurrencyExchangeTile({
     Key key,
     @required this.baseCurrency,
     this.onFlagPressed,
@@ -86,10 +86,10 @@ class CurrencyTile extends StatefulWidget {
   final TextEditingController amountController;
 
   @override
-  _CurrencyTileState createState() => _CurrencyTileState();
+  _CurrencyExchangeTileState createState() => _CurrencyExchangeTileState();
 }
 
-class _CurrencyTileState extends State<CurrencyTile> {
+class _CurrencyExchangeTileState extends State<CurrencyExchangeTile> {
   num amount = 0;
 
   @override

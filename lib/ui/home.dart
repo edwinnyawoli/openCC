@@ -153,7 +153,7 @@ class _HomePageState extends State<HomePage> {
                       final Currency baseCurrency =
                           filteredCurrencies.elementAt(index);
 
-                      return CurrencyTile(
+                      return CurrencyExchangeTile(
                         amountController: amountEditingController,
                         baseCurrency: baseCurrency,
                         fromCurrency: fromCurrency,
