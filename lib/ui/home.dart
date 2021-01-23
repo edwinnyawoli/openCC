@@ -2,6 +2,7 @@ import 'package:currency_picker/currency_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:forex/forex.dart';
 import 'package:opencc/ui/common/currency_exchange_group.dart';
+import 'package:opencc/ui/common/currency_tile.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -75,16 +76,31 @@ class _HomePageState extends State<HomePage> {
     final CurrencyService currencyService =
         Provider.of<CurrencyService>(context);
 
+    final List<Currency> currencies = currencyService.getAll();
     // Select random from and to currencies.
-    fromCurrency ??= currencyService.getAll().first;
-    toCurrency ??= currencyService.getAll().elementAt(2);
+    fromCurrency ??= currencies.first;
+    toCurrency ??= currencies.elementAt(2);
+    final Iterable<Currency> filteredCurrencies = currencies
+        .where(
+          (Currency c) =>
+              c.code != fromCurrency.code || c.code != toCurrency.code,
+        )
+        .take(10);
+
     quotesFuture ??= Forex.fx(
       base: fromCurrency.code,
       quotes: <String>[toCurrency.code],
       quoteProvider: QuoteProvider.yahoo,
     );
+    final Future<Map<String, num>> favouritesQuotes = Forex.fx(
+      base: fromCurrency.code,
+      quotes: filteredCurrencies.map((Currency c) => c.code).toList(),
+      quoteProvider: QuoteProvider.yahoo,
+    );
+    final double topSectionHeight = showLabels ? 280 : 260;
 
     return Scaffold(
+      backgroundColor: Colors.grey.shade200,
       body: Stack(
         children: <Widget>[
           Container(
@@ -95,17 +111,63 @@ class _HomePageState extends State<HomePage> {
                 bottomRight: Radius.circular(32),
               ),
             ),
-            height: showLabels ? 280 : 240,
+            height: topSectionHeight,
+            child: CurrencyExchangeGroup(
+              amountEditingController: amountEditingController,
+              fromCurrency: fromCurrency,
+              toCurrency: toCurrency,
+              quote: quotesFuture,
+              showLabels: false,
+              onSwapCurrency: swapCurrencies,
+              onSelectCurrency: selectCurrency,
+            ),
           ),
-          CurrencyExchangeGroup(
-            amountEditingController: amountEditingController,
-            fromCurrency: fromCurrency,
-            toCurrency: toCurrency,
-            quote: quotesFuture,
-            showLabels: false,
-            onSwapCurrency: swapCurrencies,
-            onSelectCurrency: selectCurrency,
-          )
+          Container(
+            margin: EdgeInsets.only(top: topSectionHeight),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(
+                      top: 16.0, left: 16, bottom: 4, right: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        'Other currencies',
+                        style: theme.textTheme.subtitle1,
+                      ),
+                      Text(
+                        'Your amount is automatically converted to a few other currencies below',
+                        style: theme.textTheme.caption,
+                      )
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: ListView.separated(
+                    padding: const EdgeInsets.only(
+                        left: 16, right: 16, bottom: 32, top: 2),
+                    itemCount: filteredCurrencies.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final Currency baseCurrency =
+                          filteredCurrencies.elementAt(index);
+
+                      return CurrencyTile(
+                        amountController: amountEditingController,
+                        baseCurrency: baseCurrency,
+                        fromCurrency: fromCurrency,
+                        quote: favouritesQuotes,
+                      );
+                    },
+                    separatorBuilder: (BuildContext context, int index) {
+                      return const SizedBox(height: 12);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
