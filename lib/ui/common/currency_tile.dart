@@ -171,9 +171,18 @@ class _CurrencyTileState extends State<CurrencyTile> {
                     String amountStr = '?';
                     String rate = '?';
                     if (!snapshot.hasError) {
-                      final num rateValue = snapshot.data.entries.first.value;
-                      rate = rateValue?.toStringAsFixed(4);
-                      amountStr = (amount * rateValue).toStringAsFixed(2);
+                      try {
+                        final Iterable<MapEntry<String, num>> entries =
+                            snapshot.data.entries;
+                        final MapEntry<String, num> entry = entries.firstWhere(
+                            (MapEntry<String, num> entry) =>
+                                entry.key.endsWith(widget.baseCurrency.code));
+                        final num rateValue = entry.value;
+                        rate = rateValue?.toStringAsFixed(4);
+                        amountStr = (amount * rateValue).toStringAsFixed(2);
+                      } catch (e) {
+                        // Error resolving rate and amount
+                      }
                     }
 
                     amountWidget = Text(
