@@ -83,7 +83,7 @@ class _HomePageState extends State<HomePage> {
     final Iterable<Currency> filteredCurrencies = currencies
         .where(
           (Currency c) =>
-              c.code != fromCurrency.code || c.code != toCurrency.code,
+              c.code != fromCurrency.code && c.code != toCurrency.code,
         )
         .take(10);
 
