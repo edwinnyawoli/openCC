@@ -36,6 +36,16 @@ class CurrencyExchangeGroup extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            Align(
+              alignment: Alignment.center,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Text(
+                  'Tap on a flag to select a currency',
+                  style: theme.textTheme.caption.copyWith(color: Colors.white),
+                ),
+              ),
+            ),
             Visibility(
               visible: showLabels ?? false,
               child: Label(
