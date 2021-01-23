@@ -303,14 +303,24 @@ class CountrySelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool showFlagDropdown = onFlagPressed != null;
+    // Showing the flag causes the contents of the column below to be pushed
+    // up and thus a padding is added to the top to offset that.
+    // Where the icon is not shown, there is no need to offset with a top
+    // padding
+    final double topPadding = showFlagDropdown ? 8.0 : 0.0;
+
     return InkWell(
       child: Padding(
-        padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 8.0),
+        padding: EdgeInsets.only(left: 16.0, right: 16.0, top: topPadding),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             CountryPickerUtils.getDefaultFlagImage(country),
-            const Icon(Icons.keyboard_arrow_down)
+            Visibility(
+              visible: showFlagDropdown,
+              child: const Icon(Icons.keyboard_arrow_down),
+            )
           ],
         ),
       ),
