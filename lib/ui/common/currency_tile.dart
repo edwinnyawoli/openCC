@@ -167,8 +167,8 @@ class _CurrencyExchangeTileState extends State<CurrencyExchangeTile> {
                     );
 
                     return Shimmer.fromColors(
-                      baseColor: Colors.grey.shade50,
-                      highlightColor: Colors.grey.shade200,
+                      baseColor: Colors.grey.shade100,
+                      highlightColor: Colors.grey.shade300,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.end,
