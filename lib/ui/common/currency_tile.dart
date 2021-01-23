@@ -155,17 +155,32 @@ class _CurrencyExchangeTileState extends State<CurrencyExchangeTile> {
 
                 switch (snapshot.connectionState) {
                   case ConnectionState.waiting:
-                    amountWidget = SizedBox(
-                      width: 200.0,
-                      height: 100.0,
-                      child: Shimmer.fromColors(
-                        baseColor: Colors.red,
-                        highlightColor: Colors.yellow,
-                        child: const SizedBox(width: 50, height: 8),
+                    amountWidget = Container(
+                      width: 50,
+                      height: 15,
+                      color: Colors.black,
+                    );
+                    rateWidget = Container(
+                      height: 10,
+                      width: 80,
+                      color: Colors.black,
+                    );
+
+                    return Shimmer.fromColors(
+                      baseColor: Colors.grey.shade50,
+                      highlightColor: Colors.grey.shade200,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: <Widget>[
+                          amountWidget,
+                          const SizedBox(
+                            height: 4,
+                          ),
+                          rateWidget
+                        ],
                       ),
                     );
-                    rateWidget = Container();
-                    break;
 
                   default:
                     String amountStr = '?';
@@ -197,17 +212,15 @@ class _CurrencyExchangeTileState extends State<CurrencyExchangeTile> {
                       '1 ${widget.fromCurrency.code} = $rate ${widget.baseCurrency.code}',
                       style: theme.textTheme.caption,
                     );
-                    break;
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
+                        amountWidget,
+                        rateWidget,
+                      ],
+                    );
                 }
-
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    amountWidget,
-                    rateWidget,
-                  ],
-                );
               },
             ),
           ),
