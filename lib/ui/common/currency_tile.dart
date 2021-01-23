@@ -178,7 +178,7 @@ class _CurrencyExchangeTileState extends State<CurrencyExchangeTile> {
                             (MapEntry<String, num> entry) =>
                                 entry.key.endsWith(widget.baseCurrency.code));
                         final num rateValue = entry.value;
-                        rate = rateValue?.toStringAsFixed(4);
+                        rate = rateValue?.toStringAsFixed(3);
                         amountStr = (amount * rateValue).toStringAsFixed(2);
                       } catch (e) {
                         // Error resolving rate and amount
