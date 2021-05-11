@@ -218,6 +218,7 @@ class _CurrencyExchangeTileState extends State<CurrencyExchangeTile> {
                     rateWidget = Text(
                       '1 ${widget.fromCurrency.code} = $rate ${widget.baseCurrency.code}',
                       style: theme.textTheme.caption,
+                      textAlign: TextAlign.end,
                     );
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.center,
