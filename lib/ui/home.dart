@@ -1,6 +1,7 @@
 import 'package:currency_picker/currency_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:forex/forex.dart';
+import 'package:opencc/data/preferences.dart';
 import 'package:opencc/ui/common/currency_exchange_group.dart';
 import 'package:opencc/ui/common/currency_tile.dart';
 import 'package:provider/provider.dart';
@@ -17,10 +18,16 @@ class _HomePageState extends State<HomePage> {
   bool showLabels = false;
   Future<Map<String, num>> quotesFuture;
   final TextEditingController amountEditingController = TextEditingController();
+  PreferenceManager preferencesManager;
+  String fromCurrencyCodePref;
+  String toCurrencyCodePref;
+  bool initialized = false;
 
   @override
   void initState() {
     super.initState();
+    preferencesManager = Provider.of<PreferenceManager>(context, listen: false);
+    initializeCurrencyPreferences();
   }
 
   @override
@@ -35,6 +42,7 @@ class _HomePageState extends State<HomePage> {
       fromCurrency = toCurrency;
       toCurrency = currency;
 
+      saveCurrencyPreferences();
       resetQuotes();
     });
   }
@@ -64,10 +72,24 @@ class _HomePageState extends State<HomePage> {
               toCurrency = currency;
               break;
           }
+          saveCurrencyPreferences();
           resetQuotes();
         });
       },
     );
+  }
+
+  Future<void> saveCurrencyPreferences() async {
+    await preferencesManager.setFromCurrency(fromCurrency.code);
+    await preferencesManager.setToCurrency(toCurrency.code);
+  }
+
+  Future<void> initializeCurrencyPreferences() async {
+    fromCurrencyCodePref = await preferencesManager.getFromCurrency();
+    toCurrencyCodePref = await preferencesManager.getToCurrency();
+    setState(() {
+      initialized = true;
+    });
   }
 
   @override
@@ -76,32 +98,45 @@ class _HomePageState extends State<HomePage> {
     final CurrencyService currencyService =
         Provider.of<CurrencyService>(context);
 
-    final List<Currency> currencies = currencyService.getAll();
-    // Select random from and to currencies.
-    fromCurrency ??= currencies.first;
-    toCurrency ??= currencies.elementAt(2);
-    final Iterable<Currency> filteredCurrencies = currencies
-        .where(
-          (Currency c) =>
-              c.code != fromCurrency.code && c.code != toCurrency.code,
-        )
-        .take(10);
+    Widget body;
+    if (initialized) {
+      final List<Currency> currencies = currencyService.getAll();
+      if (fromCurrency == null && fromCurrencyCodePref != null) {
+        fromCurrency = currencies
+            .where((Currency currency) => currency.code == fromCurrencyCodePref)
+            .first;
+      } else {
+        fromCurrency ??= currencies.first;
+      }
 
-    quotesFuture ??= Forex.fx(
-      base: fromCurrency.code,
-      quotes: <String>[toCurrency.code],
-      quoteProvider: QuoteProvider.yahoo,
-    );
-    final Future<Map<String, num>> favouritesQuotes = Forex.fx(
-      base: fromCurrency.code,
-      quotes: filteredCurrencies.map((Currency c) => c.code).toList(),
-      quoteProvider: QuoteProvider.yahoo,
-    );
-    final double topSectionHeight = showLabels ? 280 : 260;
+      if (toCurrency == null && toCurrencyCodePref != null) {
+        toCurrency = currencies
+            .where((Currency currency) => currency.code == toCurrencyCodePref)
+            .first;
+      } else {
+        toCurrency ??= currencies.elementAt(2);
+      }
 
-    return Scaffold(
-      backgroundColor: Colors.grey.shade200,
-      body: Stack(
+      final Iterable<Currency> filteredCurrencies = currencies
+          .where(
+            (Currency c) =>
+                c.code != fromCurrency.code && c.code != toCurrency.code,
+          )
+          .take(10);
+
+      quotesFuture ??= Forex.fx(
+        base: fromCurrency.code,
+        quotes: <String>[toCurrency.code],
+        quoteProvider: QuoteProvider.yahoo,
+      );
+      final Future<Map<String, num>> favouritesQuotes = Forex.fx(
+        base: fromCurrency.code,
+        quotes: filteredCurrencies.map((Currency c) => c.code).toList(),
+        quoteProvider: QuoteProvider.yahoo,
+      );
+      final double topSectionHeight = showLabels ? 280 : 260;
+
+      body = Stack(
         children: <Widget>[
           Container(
             decoration: const BoxDecoration(
@@ -169,7 +204,16 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ],
-      ),
+      );
+    } else {
+      body = const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: Colors.grey.shade200,
+      body: body,
     );
   }
 }
