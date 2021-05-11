@@ -95,10 +95,17 @@ class _CurrencyExchangeTileState extends State<CurrencyExchangeTile> {
   @override
   void initState() {
     super.initState();
+    updateAmount();
     widget.amountController.addListener(() {
-      setState(() {
-        amount = num.tryParse(widget.amountController.text) ?? 0;
-      });
+      if (mounted) {
+        updateAmount();
+      }
+    });
+  }
+
+  void updateAmount() {
+    setState(() {
+      amount = num.tryParse(widget.amountController.text) ?? 0;
     });
   }
 
