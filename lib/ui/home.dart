@@ -27,6 +27,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     preferencesManager = Provider.of<PreferenceManager>(context, listen: false);
+    amountEditingController.text = '1';
     initializeCurrencyPreferences();
   }
 
